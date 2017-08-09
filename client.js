@@ -1,15 +1,16 @@
 
 var vcclientList = [];
 
-if(process.argv.length != 4){
-  console.log('usage: clientA <clientName> <vsserver|vsclient>');
+if(process.argv.length != 6){
+  console.log('usage: client <clientName> <vsserver|vsclient> <serverIP> <serverPort>');
   process.exit(1);
 }
 
-var addressOfS = '10.1.10.173'; // replace this with the IP of the server running publicserver.js
-var portOfS = 9999;
 var clientName = process.argv[2];
 var role = process.argv[3];
+var addressOfS = process.argv[4];
+var portOfS = process.argv[5];
+
 var socketToSBusy = false;
 
 console.log(clientName, ' starting up ...');
