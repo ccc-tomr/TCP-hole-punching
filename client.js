@@ -46,12 +46,16 @@ socketToS.on('data', function (data) {
 
       console.log(clientName, ': new vsclient connected to S');
 
+      //disconnect from server to let vsclient connect over same ip/port
+      //socketToS.end();
+
       vcclientList.push(clientinfo);
       //try to punch a hole for new vcclient
-      VSClientSocket = require('net').createConnection(
-        {host : clientinfo.publicAdress, port : clientinfo.publicPort}, function () {
-          console.log(clientName, ': trying to punch a hole ...');
-      });
+      console.log(clientName, ': trying to punch a hole ...');
+      // VSClientSocket = require('net').createConnection(
+      //   {host : clientinfo.publicAdress, port : clientinfo.publicPort}, function () {
+      //     console.log(clientName, ': hole punching');
+      // });
 
       //open connection for vsclients
       var server = require('net').createServer(function (socket) {
@@ -71,6 +75,10 @@ socketToS.on('data', function (data) {
   } else if (role === 'vsclient') {
     // messages to be processed by vsclient
     if (JSON.parse(data).cmd === 'connectToVSserver') {
+
+      //disconnect from server to let vsserver connect over same ip/port
+      //socketToS.end();
+
       socketToVSserver = require('net').createConnection(
         {host : JSON.parse(data).payload.clientinfo.publicAdress,
           port : JSON.parse(data).payload.clientinfo.publicPort}, function () {

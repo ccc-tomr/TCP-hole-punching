@@ -5,16 +5,16 @@ var serverPort = 9999;
 var clientList = [];
 var clientID = 0; //ever growing ID of connecting clients
 
-  process.on('uncaughtException', function (err) {
-      console.log(err);
-  });
+process.on('uncaughtException', function (err) {
+    console.log(err);
+});
 
 // listening for incoming connections
 var server = require('net').createServer(function (socket) {
 
   clientID += 1;
   var client = {socket:socket, clientID:clientID};
-  console.log('S: Somebody new connected...', socket.remoteAddress);
+  console.log('S: Somebody new connected...', socket.remoteAddress,':', socket.remotePort);
 
   // After server received all necessary clientinfo, store it
   socket.on('data', function (data) {
@@ -25,7 +25,7 @@ var server = require('net').createServer(function (socket) {
     {
       client.clientinfo = JSON.parse(data).payload;
       client.clientinfo.publicAdress = socket.remoteAddress;
-      client.clientinfo.publicPort = socket.remotePort;
+      client.clientinfo.publicPort = socket.localPort;
 
       clientList.push(client);
 
