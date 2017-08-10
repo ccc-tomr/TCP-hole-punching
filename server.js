@@ -1,3 +1,6 @@
+
+
+
 var serverPort = 9999;
 var clientList = [];
 var clientID = 0; //ever growing ID of connecting clients
@@ -6,7 +9,7 @@ var server = require('net').createServer(function (socket) {
 
   clientID += 1;
   var client = {socket:socket, clientID:clientID};
-  console.log('S: Somebody new connected...', socket.address());
+  console.log('S: Somebody new connected...', socket.remoteAddress);
 
   // After server received all necessary clientinfo, store it
   socket.on('data', function (data) {
@@ -16,8 +19,8 @@ var server = require('net').createServer(function (socket) {
     if(JSON.parse(data).cmd === 'clientinfo')
     {
       client.clientinfo = JSON.parse(data).payload;
-      client.clientinfo.publicAdress = socket.address().address;
-      client.clientinfo.publicPort = socket.address().port;
+      client.clientinfo.publicAdress = socket.remoteAddress;
+      client.clientinfo.publicPort = socket.remotePort;
 
       clientList.push(client);
 
@@ -61,7 +64,7 @@ var server = require('net').createServer(function (socket) {
   });
 
   socket.on('end', function(){
-    console.log('S: client disconnected. ', socket.address());
+    console.log('S: client disconnected. ', socket.remoteAddress);
     // delete client from client list
     var idx = clientList.map(function(el) {return el.clientID; }).indexOf(clientID);
     console.log( 'index to be removed = ', idx);
