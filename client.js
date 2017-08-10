@@ -6,6 +6,10 @@ if(process.argv.length != 6){
   process.exit(1);
 }
 
+process.on('uncaughtException', function (err) {
+    console.log(err);
+});
+
 var clientName = process.argv[2];
 var role = process.argv[3];
 var addressOfS = process.argv[4];
@@ -49,6 +53,17 @@ socketToS.on('data', function (data) {
           console.log(clientName, ': trying to punch a hole ...');
       });
 
+      //open connection for vsclients
+      var server = require('net').createServer(function (socket) {
+        console.log(clientName, ': Somebody new connected...', socket.remoteAddress);
+      });
+
+      // listen for vsclients
+      server.listen(socketToS.localPort, socketToS.localAddress, function (err) {
+    		if(err) return console.log(clientName, ': error at listen :',err);
+    	});
+      console.log(clientName, ': listening at ', socketToS.localAddress,':', socketToS.localPort );
+
       //tell S to notify vsclient that vsserver is ready to connect
       cmd = { cmd:'NotifyVSClients' };
       socketToS.write(JSON.stringify(cmd));
@@ -56,7 +71,9 @@ socketToS.on('data', function (data) {
   } else if (role === 'vsclient') {
     // messages to be processed by vsclient
     if (JSON.parse(data).cmd === 'connectToVSserver') {
-      socketToVSserver = require('net').createConnection({host : addressOfS, port : portOfS}, function () {
+      socketToVSserver = require('net').createConnection(
+        {host : JSON.parse(data).payload.clientinfo.publicAdress,
+          port : JSON.parse(data).payload.clientinfo.publicPort}, function () {
         console.log(clientName, ': connected to ',JSON.parse(data).payload.clientinfo.name
         ,' via', JSON.parse(data).payload.clientinfo.publicAdress, JSON.parse(data).payload.clientinfo.publicPort);
 

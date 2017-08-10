@@ -4,6 +4,11 @@
 var serverPort = 9999;
 var clientList = [];
 var clientID = 0; //ever growing ID of connecting clients
+
+  process.on('uncaughtException', function (err) {
+      console.log(err);
+  });
+
 // listening for incoming connections
 var server = require('net').createServer(function (socket) {
 
